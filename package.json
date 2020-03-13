@@ -24,7 +24,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "prettier --write src/**/*.ts --use-tabs"
+      "pre-commit": "prettier --write src/**/*.ts --use-tabs && git add ."
     }
   }
 }
