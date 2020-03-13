@@ -1,0 +1,30 @@
+{
+  "name": "p2p-network",
+  "version": "1.0.0",
+  "description": "The future p2p network for distributed computing",
+  "main": "dist/app.js",
+  "scripts": {
+    "start": "tsc && node ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/unnamed-company/p2p-network.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/unnamed-company/p2p-network/issues"
+  },
+  "homepage": "https://github.com/unnamed-company/p2p-network#readme",
+  "devDependencies": {
+    "@types/node": "^13.9.1",
+    "husky": "^4.2.3",
+    "prettier": "1.19.1",
+    "typescript": "^3.8.3"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "prettier --write src/**/*.ts"
+    }
+  }
+}
