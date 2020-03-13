@@ -1,1 +1,3 @@
-console.log(__dirname)
+if (__dirname) {
+console.log(__dirname);
+}
