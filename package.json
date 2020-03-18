@@ -1,0 +1,28 @@
+{
+	"name": "p2p-server",
+	"version": "1.0.0",
+	"description": "",
+	"main": "dist/app.js",
+	"scripts": {
+		"start": "tsc && node .",
+		"build": "tsc"
+	},
+	"author": "",
+	"license": "ISC",
+	"dependencies": {
+		"@types/node": "^13.9.1",
+		"dotenv": "^8.2.0",
+		"express": "^4.17.1",
+		"http": "^0.0.0",
+		"husky": "^4.2.3",
+		"mongoose": "^5.9.5",
+		"prettier": "^1.19.1",
+		"socket.io": "^2.3.0",
+		"typescript": "^3.8.3"
+	},
+	"husky": {
+		"hooks": {
+			"pre-commit": "prettier --write renderer/**/*.tsx --use-tabs && prettier --write electron-src/**/*.ts --use-tabs && git add ."
+		}
+	}
+}
