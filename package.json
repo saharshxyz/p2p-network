@@ -39,7 +39,7 @@
 	"homepage": "https://github.com/unnamed-company/p2p-network#readme",
 	"husky": {
 		"hooks": {
-			"pre-commit": "prettier --write '*/**/{!(out*),!(.next)}/**/*.js' --use-tabs && git add ."
+			"pre-commit": "prettier --write */**/*.js --use-tabs && git add ."
 		}
 	}
 }
