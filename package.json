@@ -1,24 +1,11 @@
 {
 	"name": "p2p-network",
 	"version": "1.0.0",
-	"main": "main/index.js",
+	"main": "app.js",
 	"scripts": {
-		"clean": "rimraf dist main renderer/out renderer/.next",
 		"start": "electron .",
-		"build-renderer": "next build renderer && next export renderer",
-		"build-electron": "tsc -p electron-src",
-		"build": "yarn build-renderer && yarn build-electron",
-		"pack-app": "yarn build && electron-builder --dir",
-		"dist": "yarn build && electron-builder",
-		"type-check": "tsc",
+		"build-renderer": "next build src && next export src",
 		"start-server": "next renderer"
-	},
-	"build": {
-		"asar": true,
-		"files": [
-			"main",
-			"renderer/out"
-		]
 	},
 	"devDependencies": {
 		"@types/node": "^12.12.21",
@@ -52,7 +39,7 @@
 	"homepage": "https://github.com/unnamed-company/p2p-network#readme",
 	"husky": {
 		"hooks": {
-			"pre-commit": "prettier --write 'renderer/{!(out*),!(.next)/**/*}/*.js' --use-tabs && prettier --write electron-src/**/*.ts --use-tabs && git add ."
+			"pre-commit": "prettier --write '*/**/{!(out*),!(.next)}/**/*.js' --use-tabs && git add ."
 		}
 	}
 }
