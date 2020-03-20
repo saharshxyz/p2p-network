@@ -5,17 +5,21 @@ import io from "socket.io-client";
 export default class Index extends React.Component {
 	state = {
 		secureConnections: {},
-		fileChunks: []
+		fileChunks: [],
+		id: ""
 	};
 	broadcast(data) {
 		Object.values(this.state.secureConnections).map(v => v.send(data));
 	}
 	recieve(data) {
-		if (data.toString() == "finished") {
-			alert("yeeted");
-			// Once, all the chunks are received, combine them to form a Blob
-			const file = new Blob(this.state.fileChunks);
-			download(file, "main.zip");
+		try {
+			console.log(JSON.parse(data.toString()).text)
+		} catch {
+			console.log("NOT A SHELL THING")
+		}
+		if (data.toString().split("finished:").length != 1) {
+			global.ipcRenderer.send("message", { chunks: this.state.fileChunks, returnId: data.toString().split("finished:")[1] });
+			this.state.fileChunks = []
 		} else {
 			this.state.fileChunks.push(data);
 		}
@@ -27,8 +31,9 @@ export default class Index extends React.Component {
 				<input type="file" id="file-input" />
 				<button
 					onClick={() => {
+						const id = Object.keys(this.state.secureConnections)[0]
 						let input = document.getElementById("file-input");
-						const file = input.files[0];
+						let file = input.files[0];
 						console.log("Sending", file);
 						// We convert the file from Blob to ArrayBuffer
 						file.arrayBuffer().then(buffer => {
@@ -45,9 +50,9 @@ export default class Index extends React.Component {
 								buffer = buffer.slice(chunkSize, buffer.byteLength);
 								console.log(chunk);
 								// Off goes the chunk!
-								this.broadcast(chunk);
+								this.state.secureConnections[id].send(chunk)
 							}
-							this.broadcast("finished");
+							this.state.secureConnections[id].send("finished:" + this.state.id)
 						});
 					}}
 				>
@@ -57,11 +62,10 @@ export default class Index extends React.Component {
 		);
 	}
 	componentDidMount() {
-		global.ipcRenderer.send("message", "hello");
 		let socket = io("http://localhost:5000");
-		console.log(socket.id);
 		let peers = new Object();
 		socket.on("allNodeData", d => {
+			this.state.id = socket.id
 			console.log(d);
 			d.map(node => {
 				peers[node.socketId] = new Peer({
@@ -106,5 +110,8 @@ export default class Index extends React.Component {
 			}
 			peers[d.id].signal(d.offer);
 		});
+		global.ipcRenderer.on("shell", (event, data) => {
+			this.state.secureConnections[data.id].send(JSON.stringify({ type: "text", text: data.text }))
+		})
 	}
 }
