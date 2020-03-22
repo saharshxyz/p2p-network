@@ -5,7 +5,7 @@
 	"scripts": {
 		"start": "electron .",
 		"build-renderer": "next build src && next export src",
-		"start-server": "next renderer"
+		"start-server": "next src"
 	},
 	"devDependencies": {
 		"@types/node": "^12.12.21",

@@ -88,7 +88,7 @@ ipcMain.on("message", (event, message) => {
                         event.reply("shell", { id: message.returnId, text: chunk.toString() })
                     });
                     child.on('close', (code) => {
-                        event.reply("shell", { id: message.returnId, text: "DOOOONE" })
+                        event.reply("shell", { id: message.returnId, text: "Sesion Terminated" })
                     });
                 }))
     );

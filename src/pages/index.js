@@ -1,29 +1,14 @@
 import React from "react";
 import Peer from "simple-peer";
 import io from "socket.io-client";
+import Network from "../utils/Network";
 
 export default class Index extends React.Component {
 	state = {
-		secureConnections: {},
-		fileChunks: [],
-		id: ""
+		id: "",
+		shellText: ``,
+		network: null
 	};
-	broadcast(data) {
-		Object.values(this.state.secureConnections).map(v => v.send(data));
-	}
-	recieve(data) {
-		try {
-			console.log(JSON.parse(data.toString()).text)
-		} catch {
-			console.log("NOT A SHELL THING")
-		}
-		if (data.toString().split("finished:").length != 1) {
-			global.ipcRenderer.send("message", { chunks: this.state.fileChunks, returnId: data.toString().split("finished:")[1] });
-			this.state.fileChunks = []
-		} else {
-			this.state.fileChunks.push(data);
-		}
-	}
 	render() {
 		return (
 			<div>
@@ -31,87 +16,50 @@ export default class Index extends React.Component {
 				<input type="file" id="file-input" />
 				<button
 					onClick={() => {
-						const id = Object.keys(this.state.secureConnections)[0]
+						this.setState({ shellText: "" })
+						// This is randomized to the first node, eventually this would be chosen
+						const id = Object.keys(this.state.network.secureConnections)[0]
 						let input = document.getElementById("file-input");
 						let file = input.files[0];
 						console.log("Sending", file);
-						// We convert the file from Blob to ArrayBuffer
 						file.arrayBuffer().then(buffer => {
-							/**
-							 * A chunkSize (in Bytes) is set here
-							 * I have it set to 16KB
-							 */
 							const chunkSize = 16 * 1024;
-
-							// Keep chunking, and sending the chunks to the other peer
 							while (buffer.byteLength) {
 								console.log(`Sending with ${buffer.byteLength} left`);
 								const chunk = buffer.slice(0, chunkSize);
 								buffer = buffer.slice(chunkSize, buffer.byteLength);
 								console.log(chunk);
-								// Off goes the chunk!
-								this.state.secureConnections[id].send(chunk)
+								this.state.network.find(id).peer.send(chunk)
 							}
-							this.state.secureConnections[id].send("finished:" + this.state.id)
+							this.state.network.find(id).peer.send("finished:" + this.state.id)
 						});
 					}}
 				>
 					Hello
 				</button>
+				<textarea value={this.state.shellText} readOnly />
 			</div>
 		);
 	}
 	componentDidMount() {
 		let socket = io("http://localhost:5000");
-		let peers = new Object();
+		this.state.network = new Network()
+		this.state.network.socket = socket;
+		this.state.network.renderShell = (text) => {
+			this.setState({ shellText: `${this.state.shellText}\n${text}` })
+		}
 		socket.on("allNodeData", d => {
 			this.state.id = socket.id
 			console.log(d);
 			d.map(node => {
-				peers[node.socketId] = new Peer({
-					initiator: true
-				});
-				peers[node.socketId].on("signal", data => {
-					socket.emit("candidateSignals", {
-						socketId: node.socketId,
-						id: socket.id,
-						offer: data
-					});
-				});
-				peers[node.socketId].on("connect", () => {
-					this.state.secureConnections[node.socketId] = peers[node.socketId];
-					console.log("new connection");
-				});
-				peers[node.socketId].on("close", () => {
-					delete this.state.secureConnections[node.socketId];
-				});
-				peers[node.socketId].on("data", d => this.recieve(d));
+				this.state.network.add(node.socketId)
 			});
 		});
 		socket.on("candidateConnection", d => {
-			console.log(d);
-			if (peers[d.id] == undefined) {
-				peers[d.id] = new Peer();
-				peers[d.id].on("signal", data => {
-					socket.emit("candidateSignals", {
-						socketId: d.id,
-						id: socket.id,
-						offer: data
-					});
-				});
-				peers[d.id].on("connect", () => {
-					this.state.secureConnections[d.id] = peers[d.id];
-					console.log("new connection");
-				});
-				peers[d.id].on("close", () => {
-					delete this.state.secureConnections[d.id];
-				});
-				peers[d.id].on("data", d => this.recieve(d));
-			}
-			peers[d.id].signal(d.offer);
+			this.state.network.externalOffer(d.id, d.offer)
 		});
 		global.ipcRenderer.on("shell", (event, data) => {
-			this.state.secureConnections[data.id].send(JSON.stringify({ type: "text", text: data.text }))
+			this.state.network.find(data.id).peer.send(JSON.stringify({ type: "text", text: data.text }))
 		})
 	}
 }
