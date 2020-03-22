@@ -27,6 +27,9 @@ export default {
 		gray: "#dfe3e8",
 		accent: "#f49342",
 		darken: "#00044c",
+		red: "#f44",
+		yellow: "#ffd533",
+		green: "#44ff50",
 		modes: {
 			// Change to dark later, put in to test light mode
 			dar: {
@@ -122,6 +125,26 @@ export default {
 		},
 		img: {
 			maxWidth: "100%"
+		}
+	},
+	variants: {
+		frameButton: {
+			p: "10px",
+			transition: "0.5s",
+			":hover": {
+				boxShadow: "2px 2px",
+				cursor: "pointer"
+			}
+		},
+		sideBarButton: {
+			p: "5px",
+			width: "100%",
+			fontWeight: "bold",
+			":hover": {
+				bg: "primary",
+				color: "white",
+				cursor: "pointer"
+			}
 		}
 	}
 };
