@@ -4,5 +4,5 @@ const { ipcRenderer, remote } = require("electron");
 // needed node functionality here
 process.once("loaded", () => {
 	global.ipcRenderer = ipcRenderer;
-	global.window = remote.BrowserWindow.getFocusedWindow();
+	global.Window = remote.BrowserWindow.getFocusedWindow();
 });
