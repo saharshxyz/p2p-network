@@ -127,6 +127,14 @@ export default {
 			maxWidth: "100%"
 		}
 	},
+	buttons: {
+		primary: {
+			":hover": {
+				bg: "muted",
+				cursor: "pointer"
+			}
+		}
+	},
 	variants: {
 		frameButton: {
 			p: "10px",
@@ -141,10 +149,28 @@ export default {
 			width: "100%",
 			fontWeight: "bold",
 			":hover": {
-				bg: "primary",
+				bg: "secondary",
 				color: "white",
 				cursor: "pointer"
 			}
+		},
+		sideBarButtonActive: {
+			p: "5px",
+			width: "100%",
+			fontWeight: "bold",
+			bg: "secondary",
+			color: "white",
+			":hover": {
+				cursor: "pointer"
+			}
+		},
+		sideBar: {
+			flexDirection: "column",
+			flex: 1,
+			minWidth: "148px",
+			bg: "accent",
+			height: "100%",
+			transition: "0.8s"
 		}
 	}
 };

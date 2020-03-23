@@ -17,8 +17,7 @@ function createWindow() {
 		webPreferences: {
 			nodeIntegration: true,
 			preload: path.join(__dirname, "preload.js")
-		},
-		frame: false
+		}
 	});
 	if (process.env.NODE_ENV !== "dev") {
 		win.loadURL(
@@ -85,6 +84,7 @@ ipcMain.on("message", (event, message) => {
 					console.log(chunk.toString());
 					event.reply("shell", {
 						id: message.returnId,
+						type: "out",
 						text: chunk.toString()
 					});
 				});
@@ -92,12 +92,14 @@ ipcMain.on("message", (event, message) => {
 					console.log(chunk.toString());
 					event.reply("shell", {
 						id: message.returnId,
+						type: "err",
 						text: chunk.toString()
 					});
 				});
 				child.on("close", code => {
 					event.reply("shell", {
 						id: message.returnId,
+						type: "err",
 						text: "Sesion Terminated"
 					});
 				});

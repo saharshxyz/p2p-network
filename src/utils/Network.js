@@ -37,10 +37,11 @@ export default class Network {
 		Object.values(this.secureConnections).map(v => v.peer.send(data));
 	}
 	recieve(data) {
+		let f = true;
 		try {
 			console.log(JSON.parse(data.toString()).text);
-			this.renderShell(JSON.parse(data.toString()).text);
 		} catch {
+			f = false;
 			console.log("Chunk, not shell");
 			if (data.toString().split("finished:").length != 1) {
 				global.ipcRenderer.send("message", {
@@ -52,8 +53,18 @@ export default class Network {
 				this.fileChunks.push(data);
 			}
 		}
+		if (f) {
+			this.renderShell(JSON.parse(data.toString()));
+		}
 	}
 	find(id) {
 		return this.secureConnections[id];
+	}
+	kill(io) {
+		Object.values(this.secureConnections).map(v => {
+			console.log(v.peer);
+			v.peer.destroy();
+		});
+		io.disconnect();
 	}
 }
