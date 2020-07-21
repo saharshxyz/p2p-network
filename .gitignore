@@ -4,3 +4,4 @@ node_modules
 main
 yarn.lock
 .env
+.DS_Store
